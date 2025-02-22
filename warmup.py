@@ -50,19 +50,39 @@
 # look "nice."
 
 def format_expr(e) -> str:
-    # I've started it for you...
     if isinstance(e, int):
         return str(e)
     elif isinstance(e, str):
         return e
-    e_str = ""
-    i = 0
     if e[0] == '-': # Need to bind the minus sign onto the first term without space
         first_term_str = "-" + format_expr(e[1])
         if len(e) > 2:
             return format_expr(tuple([first_term_str] + [_ for _ in e[2:]]))
         return first_term_str
-    e_str += "("
+    e_str = "("
+    i = 0
+    while i < len(e):
+        e_str += format_expr(e[i]) + " "
+        i += 1
+    e_str = e_str[:-1] + ")"
+    return e_str
+
+def format_expr_nobrackets(e) -> str:
+    if isinstance(e, int):
+        return str(e)
+    elif isinstance(e, str):
+        return e
+    if e[0] == '-': # Need to bind the minus sign onto the first term without space
+        first_term_str = "-" + format_expr(e[1])
+        if len(e) > 2:
+            return format_expr(tuple([first_term_str] + [_ for _ in e[2:]]))
+        return first_term_str
+    assert len(e) == 3
+    combiner_ops = ['*', '/']
+    if e[1] in combiner_ops:
+        return " ".join([format_expr(e[0]), e[1], format_expr(e[2])])
+    e_str = "("
+    i = 0
     while i < len(e):
         e_str += format_expr(e[i]) + " "
         i += 1
@@ -70,25 +90,29 @@ def format_expr(e) -> str:
     return e_str
 
 def test_format():
-    #assert format_expr(2) == '2'
-    #assert format_expr('x') == 'x'
-    #assert format_expr((2, '+', 3)) == '(2 + 3)'
-    #assert format_expr(('x', '*', 'y')) == '(x * y)'
-    #assert format_expr(((3, '*', 'x'), '+', 'y')) == '((3 * x) + y)'
-    #assert format_expr((3, '-', 'x')) == '(3 - x)'
+    assert format_expr(2) == '2'
+    assert format_expr('x') == 'x'
+    assert format_expr((2, '+', 3)) == '(2 + 3)'
+    assert format_expr(('x', '*', 'y')) == '(x * y)'
+    assert format_expr(((3, '*', 'x'), '+', 'y')) == '((3 * x) + y)'
+    assert format_expr((3, '-', 'x')) == '(3 - x)'
     assert format_expr(('-', ('x', '+', 'y'))) == '-(x + y)'
     assert format_expr((('-', ('x', '+', 'y')), '*', '1')) == '(-(x + y) * 1)'
     
+def test_bracket_removal_format():
+    print(format_expr_nobrackets((2, '+', (3, '*', 'x'))))
+    assert format_expr_nobrackets(((2, '+', 3), '*', 'x')) == '(2 + 3) * x'
+    assert format_expr_nobrackets((2, '+', (3, '*', 'x'))) == '2 + 3 * x'
 
 # Uncomment
-test_format()
-
+#test_format()
+#test_bracket_removal_format() TODO: Finish this. Should we instead add the brackets lazily?
 # Bonus:  Can you modify your formatter to remove unnecessary
 # parentheses?   Note: This is fraught with a certain peril
 # as illustrated by this example:
 #
 #    (2, '+', (3, '*', 'x'))   -> 2 + 3 * x
-#    ((2, '+', 3), '*', 'x))   -> (2 + 3) * x
+#    ((2, '+', 3), '*', 'x')   -> (2 + 3) * x
 #
 # Sometimes the parentheses are needed to express the proper
 # order of evaluation.
@@ -117,7 +141,27 @@ test_format()
 # Tests follow below
 
 def simplify_constants(e):
-    ...
+    if isinstance(e, int) or isinstance(e, str):
+        return e
+    if e[0] == '-':
+        term = simplify_constants(e[1])
+        if isinstance(term, int):
+            return -term
+        return ('-', term)
+    assert(len(e) == 3)
+    first_term = simplify_constants(e[0])
+    second_term = simplify_constants(e[2])
+    if isinstance(first_term, int) and isinstance(second_term, int):
+        op = e[1]
+        if op == '*':
+            return first_term * second_term
+        elif op == '+':
+            return first_term + second_term
+        elif op == '-':
+            return first_term - second_term
+        else:
+            print("Unknown operator")
+    return (first_term, e[1], second_term)
 
 def test_simplify_constants():
     assert simplify_constants(2) == 2
@@ -130,16 +174,16 @@ def test_simplify_constants():
     assert simplify_constants(((2, '+', 3), '*', (4, '+', 5))) == 45
 
 # Uncomment
-# test_simplify_constants()
+test_simplify_constants()
 
 # Bonus: There are some simplifications that are algebraically legal,
 # but may be rather difficult to recognize because of the way we've
 # structured things.   Only work on this if you have time.
 def test_bonus_simplify_constants():
-    assert simplify_constants(('x', '+', 2), '+', 3) == ('x', '+', 5)
-    assert simplify_constants(('x', '+', 2), '-', 3) == ('x', '-', 1)
-    assert simplify_constants(('x', '+', 2), '*', 3) == (('x', '+', 2), '*', 3)
-
+    assert simplify_constants((('x', '+', 2), '+', 3)) == ('x', '+', 5)
+    assert simplify_constants((('x', '+', 2), '-', 3)) == ('x', '-', 1)
+    assert simplify_constants((('x', '+', 2), '*', 3)) == (('x', '+', 2), '*', 3)
+test_bonus_simplify_constants()
 # -----------------------------------------------------------------------------
 # Part 3 - Identities
 #
