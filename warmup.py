@@ -55,19 +55,33 @@ def format_expr(e) -> str:
         return str(e)
     elif isinstance(e, str):
         return e
-    ...
+    e_str = ""
+    i = 0
+    if e[0] == '-': # Need to bind the minus sign onto the first term without space
+        first_term_str = "-" + format_expr(e[1])
+        if len(e) > 2:
+            return format_expr(tuple([first_term_str] + [_ for _ in e[2:]]))
+        return first_term_str
+    e_str += "("
+    while i < len(e):
+        e_str += format_expr(e[i]) + " "
+        i += 1
+    e_str = e_str[:-1] + ")"
+    return e_str
 
 def test_format():
-    assert format_expr(2) == '2'
-    assert format_expr('x') == 'x'
-    assert format_expr((2, '+', 3)) == '(2 + 3)'
-    assert format_expr(('x', '*', 'y')) == '(x * y)'
-    assert format_expr(((3, '*', 'x'), '+', 'y')) == '((3 * x) + y)'
+    #assert format_expr(2) == '2'
+    #assert format_expr('x') == 'x'
+    #assert format_expr((2, '+', 3)) == '(2 + 3)'
+    #assert format_expr(('x', '*', 'y')) == '(x * y)'
+    #assert format_expr(((3, '*', 'x'), '+', 'y')) == '((3 * x) + y)'
+    #assert format_expr((3, '-', 'x')) == '(3 - x)'
     assert format_expr(('-', ('x', '+', 'y'))) == '-(x + y)'
-    assert format_expr((3, '-', 'x')) == '(3 - x)'
+    assert format_expr((('-', ('x', '+', 'y')), '*', '1')) == '(-(x + y) * 1)'
+    
 
 # Uncomment
-# test_format()
+test_format()
 
 # Bonus:  Can you modify your formatter to remove unnecessary
 # parentheses?   Note: This is fraught with a certain peril
