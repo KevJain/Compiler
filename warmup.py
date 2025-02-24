@@ -183,7 +183,7 @@ def test_bonus_simplify_constants():
     assert simplify_constants((('x', '+', 2), '+', 3)) == ('x', '+', 5)
     assert simplify_constants((('x', '+', 2), '-', 3)) == ('x', '-', 1)
     assert simplify_constants((('x', '+', 2), '*', 3)) == (('x', '+', 2), '*', 3)
-test_bonus_simplify_constants()
+#test_bonus_simplify_constants()
 # -----------------------------------------------------------------------------
 # Part 3 - Identities
 #
@@ -205,7 +205,35 @@ test_bonus_simplify_constants()
 #
 
 def simplify_identities(e):
-    ...
+    if isinstance(e, int) or isinstance(e, str):
+        return e
+    if e[0] == '-':
+        if not (isinstance(e, int) or isinstance(e, str)):
+            if e[1][0] == '-':
+                return simplify_identities(e[1][1])
+            return ('-', simplify_identities(e[1]))
+    assert(len(e) == 3)
+    op = e[1]
+    first = simplify_identities(e[0])
+    second = simplify_identities(e[2])
+    if op == '*':
+        if first == 0:
+            return 0
+        elif second == 0:
+            return 0
+        elif first == 1:
+            return simplify_identities(second)
+        elif second == 1:
+            return simplify_identities(first)
+    if op == '+':
+        if first == 0:
+            return simplify_identities(second)
+        elif second == 0:
+            return simplify_identities(first)
+    if op == '-':
+        if first == second:
+            return 0
+    return (first, op, second)
 
 def test_simplify_identities():
     assert simplify_identities(((2, '+', 'x'), '+', 0)) == (2, '+', 'x')
@@ -218,7 +246,7 @@ def test_simplify_identities():
     assert simplify_identities(('-', ('-', (2, '+', 'x')))) == (2, '+', 'x')
 
 # Uncomment
-# test_simplify_identities()
+test_simplify_identities()
 
 # -----------------------------------------------------------------------------
 # Part 4 - Combination
@@ -231,6 +259,8 @@ def test_simplify_identities():
 #
 # In this part, you should write a top-level `simplify()` function
 # that uses the other two functions to simplify equations.
+
+# 
 
 def simplify(e):
     ...
