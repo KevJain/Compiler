@@ -263,14 +263,18 @@ test_simplify_identities()
 # 
 
 def simplify(e):
-    ...
+    next = simplify_constants(simplify_identities(e))
+    while next != e:
+        e = next
+        next = simplify_constants(simplify_identities(e))
+    return e
 
 def test_simplify():
     assert simplify(('x', '+', ((-3, '+', 2), '+', 1))) == 'x'
     assert simplify((2, '+', (0, '*', 'x'))) == 2
 
 # Uncomment
-# test_simplify()
+test_simplify()
 
 # -----------------------------------------------------------------------------
 # Big Picture
