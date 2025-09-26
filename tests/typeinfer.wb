@@ -1,0 +1,4 @@
+func f(x int, y float) int {
+    var z = x + y;      // Type error. int + float
+    return z;
+}
