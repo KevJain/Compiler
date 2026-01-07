@@ -58,7 +58,7 @@ def get_assignment(name : Identifier, e : Expression) -> INSTRUCTION:
         else: 
             raise RuntimeError(f'Unknown type for assignment {name} {GlobalId}')
     else:
-        raise RuntimeError(f'Unkown type for assignment {name}')
+        raise RuntimeError(f'Unkown type for assignment {name}: {name.wtype}')
 
 def get_return(e : Expression) -> INSTRUCTION:
     match e.wtype:
@@ -67,7 +67,7 @@ def get_return(e : Expression) -> INSTRUCTION:
         case 'float':
             return FRETURN()
         case _:
-            raise RuntimeError(f'Unknown type for return {e}')
+            raise RuntimeError(f'Unknown type for return {e}: {e.wtype}')
 
 def get_local_dec(name : Identifier) -> INSTRUCTION:
     match name.wtype:
@@ -76,7 +76,7 @@ def get_local_dec(name : Identifier) -> INSTRUCTION:
         case 'float':
             return FLOCAL(name.string)
         case _:
-            raise RuntimeError(f'Unknown type for local declaration {name}')
+            raise RuntimeError(f'Unknown type for local declaration {name}: {name.wtype}')
 
 def expression_to_instructions(expr : Expression) -> EXPR:
     match expr:
@@ -90,14 +90,14 @@ def expression_to_instructions(expr : Expression) -> EXPR:
             elif wtype == 'float':
                 return EXPR([FLOAD_GLOBAL(string)])
             else:
-                raise RuntimeError(f'Unknown type for {expr}')
+                raise RuntimeError(f'Unknown type for {expr}: {expr.wtype}') # untested code path
         case LocalId(string, wtype=wtype):
             if wtype == 'int':
                 return EXPR([LOAD_LOCAL(string)])
             elif wtype == 'float':
                 return EXPR([FLOAD_LOCAL(string)])
             else:
-                raise RuntimeError(f'Unknown type for {expr}')
+                raise RuntimeError(f'Unknown type for {expr}: {wtype}')
         case BinaryOp(op, left, right):
             left_instr = expression_to_instructions(left)
             right_instr = expression_to_instructions(right)

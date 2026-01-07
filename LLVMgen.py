@@ -145,8 +145,8 @@ def create_llvm(block : BLOCK) -> BLOCK:
                 llvm_return = "" # TODO: update
                 ins = f'{register} = call i32 ({",".join(arg_types)}) @{name}('
                 args = []
-                for _ in range(num_args):
-                    args.append(f'i32 {stack.pop()}')
+                for _ in range(len(arg_wtypes)):
+                    args.append(f'i32 {stack.pop()}') # TODO: Update to reflect type
                 args.reverse()
                 ins += ", ".join(args) + ")"
                 ops.append(LLVM(ins))

@@ -31,7 +31,7 @@ def format_expression(e : Expression) -> str:
         case UnaryOp(op, exp):
             return f'-{format_expression(exp)}'
         case Parameters(data):
-            return ", ".join([format_expression(v) for v in data])
+            return ", ".join([f'{v.string} {v.wtype}' for v in data])
         case FunctionCall(name, arguments):
             return f'{format_expression(name)}({", ".join([format_expression(a) for a in arguments])})'
         case EXPR():
@@ -71,7 +71,7 @@ def format_statement(s : Statement, level) -> str:
             code += indent * level + f'}}\n'
             return code 
         case FunctionDefinition(name, parameters, body):
-            code = f'func {format_expression(name)}({format_expression(parameters)}) {{\n'
+            code = f'func {format_expression(name)}({format_expression(parameters)}) {name.wtype} {{\n'
             code += format_statements(body, level + 1)
             code += indent * level + f'}}\n'
             return code

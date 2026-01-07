@@ -74,9 +74,8 @@ def print_programs(programs : list[Program]):
         print(format_program(programs[i]))
 
 def compile(program : Program) -> Program:
-    print(format_program(program))
+    # print(format_program(program))
     program = fold_constants(program)
-    print(format_program(program))
     program = deinit_variables(program)
     program = resolve_scopes(program)
     program = unscript_toplevel(program)
@@ -86,7 +85,7 @@ def compile(program : Program) -> Program:
     program = exps_stmts_to_instr(program)
     program = create_blocks(program)
     program = add_control_flow(program)
-    print(format_program(program))
+    # print(format_program(program))
     program = llvm_make(program)
     program = create_entry_blocks(program)
     return program
@@ -116,8 +115,8 @@ def main():
 def tests(programs : list[Program]):
     tests = ['program1.wb', 'program2.wb', 'program3.wb', 'program4.wb', 'fact.wb', 'factre.wb', 'unary.wb']
     for i in range(len(tests)):
-        ast = file_to_AST(f'tests/wabbi/{tests[i]}')
         print(f"Testing {tests[i]}: ==========================================================================")
+        ast = file_to_AST(f'tests/wabbi/{tests[i]}')
         #if i < 4:
             #assert programs[i] == ast, ast
         #print(format_program(compile(ast)))

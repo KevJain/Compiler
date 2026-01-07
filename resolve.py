@@ -32,20 +32,9 @@ def resolve_statements_scope(statements : list[Statement], scope : Scope) -> lis
     out = []
     for s in statements:
         out.append(resolve_statement_scope(s, scope))
-    out = resolve_types_in_declar(out, scope)
     return out
 
-def resolve_types_in_declar(statements : list[Statement], scope : Scope) -> list[Statement]:
-    out = []
-    for s in statements:
-        if isinstance(s,VariableDeclaration):
-            if scope.top_level:
-                out.append(GlobalVarDec(Identifier(scope.lookup(s.name), s.name.string)))
-            else:
-                out.append(LocalVarDec(Identifier(scope.lookup(s.name), s.name.string)))
-        else:
-            out.append(s)
-    return out
+
 
 def resolve_statement_scope(statement : Statement, scope : Scope) -> Statement:
     match statement:
