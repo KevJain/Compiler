@@ -38,4 +38,4 @@ Output: 362880
 
 Usage: ```python compile.py [source] [executable name]```
 
-Currently only support integers. Float and char support in progress.
+Currently only supports integers. Float and char support in progress.
